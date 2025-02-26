@@ -7,7 +7,7 @@ module Game.Estrutura
     , initGame
     ) where
 
--- Uma célula pode estar: vazia, preenchida incorretamente ou marcada corretamente
+-- Uma célula pode estar: [vazia], [preenchida corretamente] ou [marcada incorretamente]
 data Cell = Empty | Filled | Marked deriving (Eq)
 
 instance Show Cell where
