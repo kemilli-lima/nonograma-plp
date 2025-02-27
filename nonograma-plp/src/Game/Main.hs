@@ -22,4 +22,4 @@ exampleGame = Game
 
 
 main :: IO ()
-main = printGame (initGame exampleGame)
+main = startGame exampleGame
