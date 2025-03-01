@@ -89,17 +89,24 @@ markCell gameState = do
             return gameState
         else do
             let (x, y) = (coords !! 0, coords !! 1)
-            putStrLn "Digite o tipo de marcação (1 para preenchida, 2 para marcada como incorreta):"
-            markType <- getLine
-            -- Se for "1" marca como Filled; se "2", como Marked.
-            let cellValue = if markType == "1" then Filled else Marked
-            newGameState <- updateCellWithCheck gameState (x, y) cellValue
+            let gridSize = length (currentGrid gameState)
+            
+            if x < 0 || x >= gridSize || y < 0 || y >= gridSize
+                then do
+                    putStrLn "Coordenadas fora dos limites do grid. Tente novamente."
+                    return gameState
+                else do
+                    putStrLn "Digite o tipo de marcação (1 para preenchida, 2 para marcada como incorreta):"
+                    markType <- getLine
+                    let cellValue = if markType == "1" then Marked else Filled
+                    newGameState <- updateCellWithCheck gameState (x, y) cellValue
+                    
+                    if lives newGameState < lives gameState
+                        then putStrLn $ "Jogada errada! Vidas restantes: " ++ show (lives newGameState)
+                        else putStrLn "Jogada correta!"
+                    
+                    return newGameState
 
-            if lives newGameState < lives gameState
-                then putStrLn $ "Jogada errada! Vidas restantes: " ++ show (lives newGameState)
-                else putStrLn "Jogada correta!"
-
-            return newGameState
 
 -- Dá uma dica para o jogador
 requestHint :: GameState -> IO GameState
