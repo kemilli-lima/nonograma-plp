@@ -2,13 +2,13 @@ module Game.UI where
 
 import Game.Logic
 import Game.Estrutura
-import Data.List (transpose)
+import Data.List (transpose, intersperse)
+import System.Console.ANSI
+import System.IO
 
--- Largura fixa para cada célula de dica
 cellWidth :: Int
 cellWidth = 2
 
--- Formata uma string com preenchimento à esquerda para que tenha largura fixa
 padLeft :: Int -> String -> String
 padLeft n s = replicate (n - length s) ' ' ++ s
 
@@ -35,23 +35,34 @@ alignColHints cols =
         headerRows = transpose splitCols
     in map concat headerRows
 
--- Imprime o estado do jogo utilizando as dicas definidas no Game
-printGame :: GameState -> IO ()
-printGame (GameState currentGrid _ game _) = do
-    let gridSize       = length currentGrid
-        maxRowHintSize = maximum (map length (rowsHints game))
-        paddedRowHints = map (formatHints maxRowHintSize) (rowsHints game)
-        colHintsAligned = alignColHints (colsHints game)
-        -- Define a margem esquerda para o cabeçalho, alinhada com os row hints e o separador " | "
-        leftMargin = replicate (cellWidth * maxRowHintSize + 2) ' '
-    
-    putStrLn "\nNonogram Grid:\n"
-    -- Imprime as linhas do cabeçalho (dicas das colunas) com a margem esquerda
-    mapM_ putStrLn $ map (leftMargin ++) colHintsAligned
-    -- Imprime cada linha do tabuleiro, precedida pelas dicas das linhas
-    mapM_ putStrLn $ zipWith (\rh row -> rh ++ " | " ++ concatMap show row) paddedRowHints currentGrid
+renderCell :: Cell -> String
+renderCell Empty  = "\ESC[37m·\ESC[0m "
+renderCell Filled = "\ESC[32m■\ESC[0m "
+renderCell Marked = "\ESC[31mX\ESC[0m "
 
--- imprime o menu para o jogador
+drawUI :: GameState -> IO ()
+drawUI gameState = do
+    clearScreen
+    setSGR [SetConsoleIntensity BoldIntensity]
+    
+    putStrLn $ "\ESC[31mVidas restantes: " ++ intersperse ' ' (replicate (lives gameState) '❤') ++ "\ESC[0m"
+
+    let gameData = game gameState
+        current = currentGrid gameState
+        maxRowHintSize = maximum (map length (rowsHints gameData))
+        paddedRowHints = map (formatHints maxRowHintSize) (rowsHints gameData)
+        colHintsAligned = alignColHints (colsHints gameData)
+        leftMargin = replicate (cellWidth * maxRowHintSize + 2) ' '
+
+    -- Imprimir dicas das colunas alinhadas com a grade
+    mapM_ (putStrLn . (leftMargin ++)) colHintsAligned
+
+    -- Imprimir a grade
+    sequence_ $ zipWith (\rh row ->
+        putStrLn $  rh ++ " | "++ concatMap renderCell row
+        ) paddedRowHints current
+
+-- Menu para o jogador
 displayMenu :: IO ()
 displayMenu = do
     putStrLn "\nEscolha uma opção:"
@@ -63,16 +74,15 @@ displayMenu = do
 getUserChoice :: IO Int
 getUserChoice = do
     putStr "Opção: "
-    choice <- getLine
-    return (read choice)
+    read <$> getLine
 
--- Marca uma celula no grid
+-- Marca uma célula no grid
 markCell :: GameState -> IO GameState
 markCell gameState = do
-    putStrLn "Digite as coordenadas da célula (linha coluna):"
+    putStrLn "Digite as coordenadas da célula (linha e coluna):"
     input <- getLine
     let coords = map read (words input) :: [Int]
-    
+
     if length coords /= 2
         then do
             putStrLn "Entrada inválida. Tente novamente."
@@ -81,16 +91,17 @@ markCell gameState = do
             let (x, y) = (coords !! 0, coords !! 1)
             putStrLn "Digite o tipo de marcação (1 para preenchida, 2 para marcada como incorreta):"
             markType <- getLine
-            let cellValue = if markType == "1" then Marked else Filled
+            -- Se for "1" marca como Filled; se "2", como Marked.
+            let cellValue = if markType == "1" then Filled else Marked
             newGameState <- updateCellWithCheck gameState (x, y) cellValue
-            
+
             if lives newGameState < lives gameState
                 then putStrLn $ "Jogada errada! Vidas restantes: " ++ show (lives newGameState)
                 else putStrLn "Jogada correta!"
-            
+
             return newGameState
 
--- Da uma dica para o jogador
+-- Dá uma dica para o jogador
 requestHint :: GameState -> IO GameState
 requestHint gameState = do
     newGameState <- giveHint gameState
@@ -99,7 +110,7 @@ requestHint gameState = do
 -- Roda o jogo
 playGame :: GameState -> IO ()
 playGame gameState = do
-    printGame gameState
+    drawUI gameState  -- exibe o tabuleiro
     if checkVictory gameState
         then putStrLn "Parabéns! Você venceu o jogo!"
         else if isGameOver gameState
@@ -119,9 +130,8 @@ playGame gameState = do
                         putStrLn "Opção inválida. Tente novamente."
                         playGame gameState
 
-
--- Inicia o jogo
-startGame :: Game -> IO ()
-startGame game = do
+-- Inicia o jogo recebendo também o nome do jogador
+startGame :: Game -> String -> IO ()
+startGame game name = do
     let initialState = initGame game
     playGame initialState
