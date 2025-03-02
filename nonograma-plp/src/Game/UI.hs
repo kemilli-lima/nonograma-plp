@@ -98,7 +98,7 @@ markCell gameState = do
                 else do
                     putStrLn "Digite o tipo de marcação (1 para preenchida, 2 para marcada como incorreta):"
                     markType <- getLine
-                    let cellValue = if markType == "1" then Marked else Filled
+                    let cellValue = if markType == "1" then Filled else Marked
                     newGameState <- updateCellWithCheck gameState (x, y) cellValue
                     
                     if lives newGameState < lives gameState
