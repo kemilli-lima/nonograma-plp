@@ -9,21 +9,31 @@ import Game.Estrutura
 
 -- Atualiza uma célula do tabuleiro e verifica se a marcação está correta
 updateCellWithCheck :: GameState -> (Int, Int) -> Cell -> IO GameState
-updateCellWithCheck gameState (x, y) cellValue = do
-    let grid = currentGrid gameState
-        sol = solution (game gameState)
-        correctValue = (sol !! x) !! y
-    
-    if cellValue /= correctValue
-        then do
-            -- Se a jogada estiver errada, apenas reduz as vidas
-            putStrLn "Jogada errada! Você perdeu uma vida."
-            return gameState { lives = max 0 (lives gameState - 1) }
-        else do
-            -- Se a jogada estiver correta, altera o grid
-            let newGrid = take x grid ++ [take y (grid !! x) ++ [cellValue] ++ drop (y + 1) (grid !! x)] ++ drop (x + 1) grid
-                newSolved = newGrid == sol
-            return gameState { currentGrid = newGrid, isSolved = newSolved }
+updateCellWithCheck gameState (x, y) cellValue
+    | x < 0 || x >= length grid || y < 0 || y >= length (head grid) = do
+        -- Coordenadas fora dos limites: retorna o estado inalterado
+        putStrLn "Coordenadas inválidas! Jogada ignorada."
+        return gameState
+    | cellValue /= correctValue = do
+        -- Jogada incorreta: reduz as vidas e mantém o grid inalterado
+        putStrLn "Jogada errada! Você perdeu uma vida."
+        return gameState { lives = max 0 (lives gameState - 1) }
+    | otherwise = do
+        -- Jogada correta: atualiza o grid e verifica se o jogo foi resolvido
+        let newGrid = updateGrid grid (x, y) cellValue
+            newSolved = newGrid == sol
+        return gameState { currentGrid = newGrid, isSolved = newSolved }
+  where
+    grid = currentGrid gameState
+    sol = solution (game gameState)
+    correctValue = (sol !! x) !! y
+
+-- Função auxiliar para atualizar o grid
+updateGrid :: [[Cell]] -> (Int, Int) -> Cell -> [[Cell]]
+updateGrid grid (x, y) cellValue =
+    take x grid ++
+    [take y (grid !! x) ++ [cellValue] ++ drop (y + 1) (grid !! x)] ++
+    drop (x + 1) grid
 
 -- Verifica se o jogador venceu o jogo
 checkVictory :: GameState -> Bool
