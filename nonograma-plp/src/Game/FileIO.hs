@@ -35,6 +35,7 @@ loadGame filePath = do
                                 else return (Left "Dados corrompidos ou inconsistentes.")
                     Nothing -> return (Left "Erro: Formato do arquivo inválido.")
 
+
 -- Verifica se o estado do jogo é válido
 validGameState :: GameState -> Bool
 validGameState gs = lives gs >= 0  
