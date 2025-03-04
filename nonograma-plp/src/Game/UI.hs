@@ -3,31 +3,24 @@
 {-# HLINT ignore "Use head" #-}
 {-# HLINT ignore "Redundant return" #-}
 module Game.UI where
+
 import Game.Logic
 import Game.Estrutura
 import Data.List (transpose, intersperse)
 import System.Console.ANSI
 import System.IO
+import Utils (formatHints)
+import Game.SaveLoad (saveGame)
 
 cellWidth :: Int
 cellWidth = 2
 
-padLeft :: Int -> String -> String
-padLeft n s = replicate (n - length s) ' ' ++ s
-
--- Formata uma lista de dicas em uma string com largura fixa
--- A largura total da string será: (maxSize * cellWidth)
-formatHints :: Int -> [Int] -> String
-formatHints maxSize hints =
-    let hintStrs = map (padLeft cellWidth . show) hints
-        padding  = replicate (cellWidth * (maxSize - length hints)) ' '
-    in padding ++ concat hintStrs
 
 -- Alinha as dicas das colunas em linhas (cabeçalho) para impressão
 alignColHints :: [[Int]] -> [String]
 alignColHints cols =
     let maxHintSize = maximum (map length cols)
-        paddedCols = map (formatHints maxHintSize) cols
+        paddedCols = map (formatHints cellWidth maxHintSize) cols
         -- Divide cada string em "células" de tamanho fixo
         splitCol :: String -> [String]
         splitCol [] = []
@@ -53,7 +46,7 @@ drawUI gameState = do
     let gameData = game gameState
         current = currentGrid gameState
         maxRowHintSize = maximum (map length (rowsHints gameData))
-        paddedRowHints = map (formatHints maxRowHintSize) (rowsHints gameData)
+        paddedRowHints = map (formatHints cellWidth maxRowHintSize) (rowsHints gameData)
         colHintsAligned = alignColHints (colsHints gameData)
         leftMargin = replicate (cellWidth * maxRowHintSize + 2) ' '
 
@@ -86,10 +79,15 @@ displayMenu = do
     putStrLn "║ 3. 🚪 Sair                     ║"
     setSGR [Reset]
 
+    setSGR [SetColor Foreground Vivid Magenta]
+    putStrLn "║ 4. 💾 Salvar jogo              ║"
+    setSGR [Reset]
+
     setSGR [SetColor Foreground Vivid Cyan]
     putStrLn "╚════════════════════════════════╝"
     setSGR [Reset]
     putStrLn ""
+
 
 -- Pega a opção que o jogador decidiu jogar
 getUserChoice :: IO Int
@@ -99,7 +97,7 @@ getUserChoice = do
     input <- getLine
     let parsed = reads input :: [(Int, String)]  -- Usa 'reads' para tentar ler um Int
     case parsed of
-        [(n, "")] | n >= 1 && n <= 3 -> return n      -- Verifica se o número está entre 1 e 4
+        [(n, "")] | n >= 1 && n <= 4 -> return n      -- Verifica se o número está entre 1 e 4
         _ -> do
             putStrLn "\ESC[31m❌  Opção inválida! Tente novamente.\ESC[0m"
             getUserChoice
@@ -141,7 +139,17 @@ requestHint :: GameState -> IO GameState
 requestHint gameState = do
     newGameState <- giveHint gameState
     return newGameState
-    
+
+-- Realiza o salvamento do jogo usando o módulo SaveLoad unificado
+saveGamePrompt :: GameState -> IO GameState
+saveGamePrompt gs = do
+    putStrLn "Digite o nome do save (ex.: save.json):"
+    name <- getLine
+    result <- saveGame name gs
+    case result of
+        Left err -> putStrLn ("Erro ao salvar: " ++ err) >> return gs
+        Right _  -> putStrLn "Jogo salvo com sucesso!" >> return gs
+
 -- Roda o jogo
 playGame :: GameState -> IO ()
 playGame gameState = do
@@ -164,6 +172,9 @@ playGame gameState = do
                     _ -> do
                         putStrLn "Opção inválida. Tente novamente."
                         playGame gameState
+                    4 -> do
+                        newGameState <- saveGamePrompt gameState
+                        playGame newGameState
 
 -- Inicia o jogo recebendo também o nome do jogador
 startGame :: Game -> String -> IO ()

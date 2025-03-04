@@ -4,6 +4,8 @@ import Game.UI (startGame)
 import Game.Estrutura
 import Data.Char (toLower)
 import System.IO (stdout, hFlush)
+import Game.PuzzleParser (parsePuzzle)
+import Game.SaveLoad (saveGame, loadGame)
 
 easyGame :: Game
 easyGame = Game 
@@ -38,30 +40,63 @@ hardGame = Game
 
 
 -- Converte a string de entrada para um nível de dificuldade válido
-parseDifficulty :: String -> Difficulty
-parseDifficulty input =
+parseDifficultyInput :: String -> Difficulty
+parseDifficultyInput input =
     case map toLower input of
-        "f"   -> Easy
-        "m"   -> Medium
+        "f" -> Easy
+        "m" -> Medium
         "d" -> Hard
-        _         -> Medium  -- Padrão caso a entrada seja inválida
+        _   -> Medium -- Padrão caso a entrada seja inválida
 
 main :: IO ()
 main = do
     hFlush stdout
     putStrLn "\ESC[36m\nBem-vindo ao jogo Nonograma! \ESC[0m"
     putStrLn "\ESC[36m-----------------------------------------\ESC[0m"
+    
+    -- Menu principal
+    putStrLn "Escolha uma opção:"
+    putStrLn "1. Novo Jogo"
+    putStrLn "2. Carregar Jogo"
+    option <- getLine
+    
+    case option of
+        "1" -> startNewGame
+        "2" -> loadExistingGame
+        _   -> do
+            putStrLn "Opção inválida! Tente novamente."
+            main
+
+-- Inicia um novo jogo
+startNewGame :: IO ()
+startNewGame = do
     putStrLn "Digite seu nome:"
     name <- getLine
     putStrLn "\n"
     putStrLn (name ++ ", selecione a dificuldade que você deseja (F para Fácil/M para Médio/D para Difícil):")
     diff <- getLine
     hFlush stdout
-    
-    let difficulty = parseDifficulty diff
-        selectedGame = case difficulty of
-            Easy   -> easyGame
-            Medium -> mediumGame
-            Hard   -> hardGame
-    
-    startGame selectedGame name
+    let difficulty = parseDifficultyInput diff
+        puzzlePath = case difficulty of
+            Easy   -> "data/puzzles/easy.txt"
+            Medium -> "data/puzzles/medium.txt"
+            Hard   -> "data/puzzles/hard.txt"
+    eitherGame <- parsePuzzle puzzlePath
+    case eitherGame of
+        Left err -> putStrLn $ "Erro: " ++ err
+        Right game -> startGame game name
+
+
+-- Carrega um jogo existente
+loadExistingGame :: IO ()
+loadExistingGame = do
+    putStrLn "Digite o nome do save:"
+    saveName <- getLine
+    result <- loadGame saveName
+    case result of
+        Left err -> do
+            putStrLn $ "Erro ao carregar jogo: " ++ err
+            main
+        Right gameState -> do
+            putStrLn $ "Jogo carregado com sucesso!"
+            playGame gameState
