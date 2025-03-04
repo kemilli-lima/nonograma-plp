@@ -2,6 +2,7 @@ module Game.Main where
 
 import Game.UI
 import Game.Estrutura
+    ( Game(Game), Difficulty(..), Cell(Empty, Marked, Filled) )
 import Data.Char (toLower)
 import System.IO (stdout, hFlush)
 import System.Console.ANSI
