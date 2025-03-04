@@ -28,22 +28,24 @@ data Game = Game {
 } deriving (Eq, Show)
 
 -- Estado dinâmico do jogo: contém o progresso atual, vidas, etc.
+-- O campo selectedCell para acompanha a célula atualmente selecionada.
 data GameState = GameState {
-    currentGrid :: Grid,   -- Tabuleiro em jogo (por exemplo, inicialmente vazio)
-    lives       :: Int,    -- Vidas restantes
-    game        :: Game,   -- Estrutura estática do jogo
-    isSolved    :: Bool    -- Indica se o jogo foi resolvido
+    currentGrid  :: Grid,       -- Tabuleiro em jogo (por exemplo, inicialmente vazio)
+    lives        :: Int,        -- Vidas restantes
+    game         :: Game,       -- Estrutura estática do jogo
+    isSolved     :: Bool,       -- Indica se o jogo foi resolvido
+    selectedCell :: (Int, Int)  -- Coordenadas da célula selecionada (cursor)
 } deriving (Eq, Show)
 
-
--- Funcao para iniciar o tabuleiro, recebe um modelo e retorna o 1o gamestate
+-- Função para iniciar o tabuleiro, recebe um modelo e retorna o 1o GameState
 initGame :: Game -> GameState
 initGame jogo = GameState
-    { currentGrid = replicate linhas (replicate colunas Empty) -- cria uma matriz vazia
-    , lives       = 3
-    , game        = jogo
-    , isSolved    = False
+    { currentGrid  = replicate linhas (replicate colunas Empty) -- cria uma matriz vazia
+    , lives        = 3
+    , game         = jogo
+    , isSolved     = False
+    , selectedCell = (0, 0)  -- inicia com o cursor na posição (0,0)
     }
   where
-    linhas  = length (solution jogo) -- Pega a qtdd de linhas da matriz
-    colunas = length (head (solution jogo)) -- entra no vector da 1a linha e pega o tamanho do vector
+    linhas  = length (solution jogo)        -- Qtde de linhas da solução
+    colunas = length (head (solution jogo))   -- Tamanho da 1ª linha da solução
