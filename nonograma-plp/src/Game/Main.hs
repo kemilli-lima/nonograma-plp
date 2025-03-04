@@ -7,19 +7,19 @@ import System.IO (stdout, hFlush)
 
 easyGame :: Game
 easyGame = Game 
-    [ [Filled, Filled, Filled, Empty]
-    , [Empty, Filled, Filled, Filled]
-    , [Filled, Empty, Filled, Empty]
-    , [Filled, Filled, Empty, Filled]
+    [ [Filled, Filled, Filled, Marked]
+    , [Marked, Filled, Filled, Filled]
+    , [Filled, Marked, Filled, Marked]
+    , [Filled, Filled, Marked, Filled]
     ] [[3],[3],[2],[3]] [[2],[2],[3],[3]] Easy
     
 mediumGame :: Game
 mediumGame = Game 
-    [ [Empty, Empty, Filled, Empty, Empty]  
-    , [Empty, Filled, Filled, Filled, Empty]
+    [ [Marked, Marked, Filled, Marked, Marked]  
+    , [Marked, Filled, Filled, Filled, Marked]
     , [Filled, Filled, Filled, Filled, Filled]
-    , [Empty, Filled, Filled, Filled, Empty]
-    , [Empty, Empty, Filled, Empty, Empty] 
+    , [Marked, Filled, Filled, Filled, Marked]
+    , [Marked, Marked, Filled, Marked, Marked] 
     ] [[1], [3], [5], [3], [1]] [[1], [3], [5], [3], [1]]
     Medium
 
