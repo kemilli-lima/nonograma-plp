@@ -2,7 +2,10 @@
 {-# HLINT ignore "Use zipWithM_" #-}
 {-# HLINT ignore "Use head" #-}
 {-# HLINT ignore "Redundant return" #-}
-module Game.UI where
+module Game.UI
+    ( startGame
+    , playGame  -- Adicione esta linha
+    ) where
 
 import Game.Logic
 import Game.Estrutura
@@ -12,6 +15,7 @@ import System.IO
 import Game.Utils (formatHints)
 import Game.SaveLoad (saveGame)
 import System.Console.ANSI (Color(Green))
+
 
 cellWidth :: Int
 cellWidth = 2
@@ -170,12 +174,12 @@ playGame gameState = do
                         newGameState <- requestHint gameState
                         playGame newGameState
                     3 -> putStrLn "Saindo do jogo..."
-                    _ -> do
-                        putStrLn "Opção inválida. Tente novamente."
-                        playGame gameState
                     4 -> do
                         newGameState <- saveGamePrompt gameState
                         playGame newGameState
+                    _ -> do
+                        putStrLn "Opção inválida. Tente novamente."
+                        playGame gameState  
 
 -- Inicia o jogo recebendo também o nome do jogador
 startGame :: Game -> String -> IO ()

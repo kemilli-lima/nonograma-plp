@@ -26,7 +26,7 @@ updateCellWithCheck gameState (x, y) cellValue
                 return gameState
             else do
                 let newGrid = updateGrid (currentGrid gameState) (x, y) cellValue
-                let newLives = if cellValue == Filled && not (isCorrectMove gameState (x, y))
+                let newLives = if cellValue == Filled && not (isCorrectMove gameState (x, y) cellValue)
                                then lives gameState - 1
                                else lives gameState
                 return gameState { currentGrid = newGrid, lives = newLives }

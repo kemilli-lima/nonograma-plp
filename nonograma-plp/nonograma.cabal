@@ -1,0 +1,25 @@
+name:                nonograma
+version:             0.1.0.0
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable nonograma
+  main-is:             Main.hs
+  other-modules:       Game.Estrutura
+                       Game.Logic
+                       Game.PuzzleParser
+                       Game.SaveLoad
+                       Game.UI
+                       Game.Utils
+  hs-source-dirs:      src
+  build-depends:       base >= 4.7 && < 5,
+                       aeson,
+                       bytestring,
+                       directory,
+                       ghc-prim,
+                       mtl,
+                       random,
+                       text,
+                       transformers,
+                       ansi-terminal
+  default-language:    Haskell2010

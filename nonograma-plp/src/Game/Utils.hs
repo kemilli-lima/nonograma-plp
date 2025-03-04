@@ -1,5 +1,5 @@
 -- src/Utils.hs
-module Utils
+module Game.Utils
     ( isValidCoordinate
     , formatHints
     ) where
