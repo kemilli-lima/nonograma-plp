@@ -9,8 +9,9 @@ import Game.Estrutura
 import Data.List (transpose, intersperse)
 import System.Console.ANSI
 import System.IO
-import Utils (formatHints)
+import Game.Utils (formatHints)
 import Game.SaveLoad (saveGame)
+import System.Console.ANSI (Color(Green))
 
 cellWidth :: Int
 cellWidth = 2
@@ -79,7 +80,7 @@ displayMenu = do
     putStrLn "║ 3. 🚪 Sair                     ║"
     setSGR [Reset]
 
-    setSGR [SetColor Foreground Vivid Magenta]
+    setSGR [SetColor Foreground Vivid Green]
     putStrLn "║ 4. 💾 Salvar jogo              ║"
     setSGR [Reset]
 

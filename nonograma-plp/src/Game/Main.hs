@@ -1,11 +1,11 @@
-module Game.Main where
+module Main where
 
 import Game.UI (startGame)
 import Game.Estrutura
-import Data.Char (toLower)
-import System.IO (stdout, hFlush)
 import Game.PuzzleParser (parsePuzzle)
 import Game.SaveLoad (saveGame, loadGame)
+import Data.Char (toLower)
+import System.IO (stdout, hFlush)
 
 easyGame :: Game
 easyGame = Game 

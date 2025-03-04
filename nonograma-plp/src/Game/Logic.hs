@@ -6,7 +6,7 @@ module Game.Logic
     ) where
 
 import Game.Estrutura
-import Utils (isValidCoordinate)
+import Game.Utils (isValidCoordinate)
 
 isCorrectMove :: GameState -> (Int, Int) -> Cell -> Bool
 isCorrectMove gameState (x, y) value =
