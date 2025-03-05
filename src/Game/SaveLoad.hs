@@ -1,5 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-|
+Module      : Game.SaveLoad
+Description : Gerencia o salvamento e carregamento do estado do jogo.
 
+Este módulo lida com a persistência do jogo, permitindo salvar e carregar o estado do jogo
+em arquivos JSON. Interage com o sistema de arquivos para ler e escrever os dados do tipo 'GameState'.
+-}
 module Game.SaveLoad 
     ( saveGame
     , loadGame
@@ -11,34 +17,58 @@ import Data.Aeson (encode, decode)
 import qualified Data.ByteString.Lazy as B
 import Game.Estrutura (GameState(..))
 
--- Diretório base para salvar os arquivos
+-- | Diretório base onde os arquivos de save serão armazenados.
 baseDir :: FilePath
 baseDir = "data/saves"
 
--- Cria o diretório de saves se ele não existir
+{-|
+Cria o diretório de saves, se não existir.
+
+@return: 'IO ()' – Realiza a criação do diretório, se necessário.
+-}
 createSaveDirectory :: IO ()
 createSaveDirectory = createDirectoryIfMissing True baseDir
 
--- Função auxiliar para validar o estado do jogo (por exemplo, vidas não negativas)
+{-|
+Valida se o estado do jogo é consistente (vidas >= 0).
+
+@param gs: Estado do jogo (GameState).
+@return: Booleano que indica se o estado é válido.
+-}
 validGameState :: GameState -> Bool
 validGameState gs = lives gs >= 0
 
--- Salva o estado do jogo em um arquivo JSON.
--- Recebe o nome do arquivo e o GameState, retornando um Either com mensagem de erro ou sucesso.
+{-|
+Salva o estado do jogo em um arquivo JSON.
+
+Escreve o estado do jogo no diretório de saves. Caso ocorra algum erro durante a escrita,
+retorna uma mensagem de erro.
+
+@param fileName: Nome do arquivo para salvar o estado.
+@param gameState: Estado do jogo a ser salvo.
+@return: 'IO (Either String ())' – Retorna 'Right ()' em caso de sucesso, ou 'Left <mensagem>' em caso de erro.
+-}
 saveGame :: FilePath -> GameState -> IO (Either String ())
 saveGame fileName gameState = do
-    createSaveDirectory  -- Garante que o diretório existe
+    createSaveDirectory  -- Garante que o diretório exista.
     let fullPath = baseDir ++ "/" ++ fileName
     result <- try (B.writeFile fullPath (encode gameState)) :: IO (Either SomeException ())
     return $ case result of
         Left err -> Left $ "Erro ao salvar jogo: " ++ show err
         Right _  -> Right ()
 
--- Carrega o estado do jogo a partir de um arquivo JSON.
--- Recebe o nome do arquivo e retorna um Either com mensagem de erro ou o GameState carregado.
+{-|
+Carrega o estado do jogo a partir de um arquivo JSON.
+
+Lê o arquivo especificado e tenta decodificar o conteúdo para o tipo 'GameState'.
+Caso o arquivo não exista, ou haja erro na leitura ou decodificação, retorna uma mensagem de erro.
+
+@param fileName: Nome do arquivo de onde carregar o estado do jogo.
+@return: 'IO (Either String GameState)' – Retorna o estado carregado ou uma mensagem de erro.
+-}
 loadGame :: FilePath -> IO (Either String GameState)
 loadGame fileName = do
-    createSaveDirectory  -- Garante que o diretório existe
+    createSaveDirectory  -- Garante que o diretório exista.
     let fullPath = baseDir ++ "/" ++ fileName
     fileExists <- doesFileExist fullPath
     if not fileExists
