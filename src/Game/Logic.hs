@@ -19,17 +19,19 @@ updateCellWithCheck gameState (x, y) cellValue
         putStrLn "Coordenadas inválidas!"
         return gameState
     | otherwise = do
+        let correctValue = solution (game gameState) !! x !! y
         let oldCell = (currentGrid gameState !! x) !! y
-        if oldCell == cellValue
-            then do
-                putStrLn "A célula já está com este valor."
-                return gameState
-            else do
-                let newGrid = updateGrid (currentGrid gameState) (x, y) cellValue
-                let newLives = if cellValue == Filled && not (isCorrectMove gameState (x, y) cellValue)
-                               then lives gameState - 1
-                               else lives gameState
-                return gameState { currentGrid = newGrid, lives = newLives }
+        
+        if oldCell == cellValue then do
+            putStrLn "A célula já está com este valor."
+            return gameState
+        else if cellValue /= correctValue then do
+            putStrLn "Jogada errada! Você perdeu uma vida."
+            return gameState { lives = max 0 (lives gameState - 1) }
+        else do
+            -- Jogada correta: atualiza a grade sem perder vidas
+            let newGrid = updateGrid (currentGrid gameState) (x, y) cellValue
+            return gameState { currentGrid = newGrid }
   where
     grid = currentGrid gameState
     rows = length grid
