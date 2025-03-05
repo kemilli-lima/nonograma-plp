@@ -1,6 +1,6 @@
 # 🎨 Nonograma - Quebra-Cabeça Lógico
 
-Bem-vindo ao **Nonograma**! 🧩 Um jogo de quebra-cabeça lógico-visual onde você deve preencher a grade corretamente para revelar uma imagem oculta! 🖼️
+Bem-vindo ao **Nonograma**! Um jogo de quebra-cabeça lógico-visual onde você deve preencher a grade corretamente para revelar uma imagem oculta! 🖼️
 
 ---
 
@@ -35,7 +35,7 @@ Bem-vindo ao **Nonograma**! 🧩 Um jogo de quebra-cabeça lógico-visual onde v
    cd nonograma-haskell
    ```
 
-2️⃣ Para garantir os efeitos visuais e as cores no jogo no terminal, é necessário executar os seguintes comandos antes:
+2️⃣ Para garantir os efeitos visuais e as cores do jogo no terminal, é necessário executar os seguintes comandos antes:
    ```sh
    # Windows
    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
