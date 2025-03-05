@@ -39,7 +39,8 @@ data GameState = GameState {
     currentGrid :: Grid,   -- Tabuleiro em jogo (por exemplo, inicialmente vazio)
     lives       :: Int,    -- Vidas restantes
     game        :: Game,   -- Estrutura estática do jogo
-    isSolved    :: Bool    -- Indica se o jogo foi resolvido
+    isSolved    :: Bool,    -- Indica se o jogo foi resolvido
+    selectedCell :: (Int, Int)  -- Coordenadas da célula selecionada (cursor)
 } deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 
@@ -50,6 +51,7 @@ initGame jogo = GameState
     , lives       = 3
     , game        = jogo
     , isSolved    = False
+    , selectedCell = (0, 0)  -- inicia com o cursor na posição (0,0)
     }
   where
     linhas  = length (solution jogo) -- Pega a qtdd de linhas da matriz
