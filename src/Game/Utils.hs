@@ -4,7 +4,7 @@ module Game.Utils
     , formatHints
     ) where
 
--- | Valida se as coordenadas (x, y) estão dentro dos limites da grade.
+-- | Valida se as coordenadas (x, y) estão dentro dos limites do tabuleiro.
 -- O primeiro argumento é uma tupla com (número de linhas, número de colunas).
 isValidCoordinate :: (Int, Int) -> (Int, Int) -> Bool
 isValidCoordinate (maxRow, maxCol) (x, y) = 
