@@ -15,7 +15,7 @@ easyGame = Game
     , [Marked, Filled, Filled, Filled]
     , [Filled, Marked, Filled, Marked]
     , [Filled, Filled, Marked, Filled]
-    ] [[3], [3], [2], [3]] [[2], [2], [3], [3]] Easy
+    ] [[3], [3], [1, 1], [2, 1]] [[1, 2], [2, 1], [3], [1, 1]] Easy
 
 mediumGame :: Game
 mediumGame = Game 
@@ -28,14 +28,14 @@ mediumGame = Game
 
 hardGame :: Game
 hardGame = Game 
-    [ [Marked, Empty, Empty, Empty, Empty, Empty, Marked]
-    , [Marked, Filled, Filled, Empty, Filled, Filled, Empty]
+    [ [Marked, Marked, Marked, Marked, Marked, Marked, Marked]
+    , [Marked, Filled, Filled, Marked, Filled, Filled, Marked]
     , [Filled, Filled, Filled, Filled, Filled, Filled, Filled]
     , [Filled, Filled, Filled, Filled, Filled, Filled, Filled]
-    , [Empty, Filled, Filled, Filled, Filled, Filled, Empty]
-    , [Empty, Empty, Filled, Filled, Filled, Empty, Empty]
-    , [Empty, Empty, Empty, Filled, Empty, Empty, Empty]
-    ] [[0], [2, 2], [7], [7], [5], [3], [1]] [[2], [4], [6], [6], [6], [4], [2]] Hard
+    , [Marked, Filled, Filled, Filled, Filled, Filled, Marked]
+    , [Marked, Marked, Filled, Filled, Filled, Marked, Marked]
+    , [Marked, Marked, Marked, Filled, Marked, Marked, Marked]
+    ] [[0], [2, 2], [7], [7], [5], [3], [1]] [[2], [4], [5], [5], [5], [4], [2]] Hard
 
 -- Converte a string de entrada para um nível de dificuldade válido
 parseDifficulty :: String -> Difficulty
