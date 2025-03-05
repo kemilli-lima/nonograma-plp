@@ -83,7 +83,7 @@ displayMenu = do
     
     setSGR [Reset]
     setSGR [SetColor Foreground Vivid Blue]
-    putStrLn "║ 1. ✏️ Marcar célula (via WASD) ║"
+    putStrLn "║ 1. ✏️ Marcar célula (via WASD)  ║"
     setSGR [Reset]
 
     setSGR [SetColor Foreground Vivid Yellow]
@@ -200,17 +200,14 @@ playGame gameState = do
                       newGameState <- requestHint gameState
                       playGame newGameState
                   3 -> putStrLn "Saindo do jogo..."
+                  4 -> do
+                      newGameState <- saveGamePrompt gameState
+                      playGame newGameState
                   _ -> do
                       putStrLn "Opção inválida. Tente novamente."
                       playGame gameState
 
--- Inicia o jogo, recebendo também o nome do jogador
-startGame :: Game -> String -> IO ()
-startGame game name = do
-    let initialState = initGame game
-    playGame initialState
-
--- Captura a opção do usuário (sem alterações significativas)
+-- Captura a opção do usuário
 getUserChoice :: IO Int
 getUserChoice = do
     setSGR [SetColor Foreground Vivid Cyan]
@@ -218,7 +215,13 @@ getUserChoice = do
     input <- getLine
     let parsed = reads input :: [(Int, String)]
     case parsed of
-        [(n, "")] | n >= 1 && n <= 3 -> return n
+        [(n, "")] | n >= 1 && n <= 4 -> return n
         _ -> do
             putStrLn "\ESC[31m❌  Opção inválida! Tente novamente.\ESC[0m"
             getUserChoice
+
+-- Inicia o jogo, recebendo também o nome do jogador
+startGame :: Game -> String -> IO ()
+startGame game name = do
+    let initialState = initGame game
+    playGame initialState
