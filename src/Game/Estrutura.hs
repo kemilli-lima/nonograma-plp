@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE DeriveAnyClass     #-}
+{-# LANGUAGE DeriveGeneric      #-}  -- Permite a derivação automática da classe Generic (usada para serialização)
+{-# LANGUAGE DeriveAnyClass     #-}  -- Permite a derivação automática de qualquer classe, como ToJSON e FromJSON
 
 {-|
 Module      : Game.Estrutura
@@ -11,16 +11,16 @@ e o estado dinâmico (GameState). Outros módulos, como Game.Logic, Game.PuzzleP
 Game.SaveLoad e Game.UI, utilizam essas definições.
 -}
 module Game.Estrutura
-    ( Cell(..)
-    , Grid
-    , Difficulty(..)
-    , Game(..)
-    , GameState(..)
-    , initGame
+    ( Cell(..)        -- Tipo que representa uma célula no jogo
+    , Grid           -- Tipo sinônimo para representar a grade do jogo
+    , Difficulty(..) -- Tipo que representa o nível de dificuldade
+    , Game(..)       -- Tipo que representa a estrutura do jogo
+    , GameState(..)  -- Tipo que representa o estado dinâmico do jogo
+    , initGame       -- Função que inicializa o estado do jogo
     ) where
 
-import GHC.Generics (Generic)
-import Data.Aeson (ToJSON, FromJSON)
+import GHC.Generics (Generic) -- Importa Generic para permitir serialização automática
+import Data.Aeson (ToJSON, FromJSON) -- Importa classes para conversão JSON
 
 -- | Representa os possíveis estados de uma célula.
 data Cell = Empty   -- ^ Célula sem decisão.
