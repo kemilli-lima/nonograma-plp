@@ -52,7 +52,7 @@ Bem-vindo ao **Nonograma**! Um jogo de quebra-cabeça lógico-visual onde você 
    defaults write -g AppleLocale en_US.UTF-8
    ```
 
-3️⃣  Compile e execute o jogo:
+3️⃣  Compile e execute o jogo dentro do diretório raíz:
    ```sh
    cabal clean
    cabal build
@@ -62,15 +62,15 @@ Bem-vindo ao **Nonograma**! Um jogo de quebra-cabeça lógico-visual onde você 
 ---
 
 ## 🎮 Como Jogar
-🎯 Escolha o **nível de dificuldade**
+🎯 Inicie um novo jogo e escolha o **nível de dificuldade** ou carregue um **jogo salvo**
 
 🎯 Use as teclas **WASD** para navegar pela grade
 
-🎯 Pressione **Enter** para marcar uma célula como preenchida 🖍️
+🎯 Pressione **Enter** para marcar uma célula como preenchida (1 para colorida e 2 para não-colorida) 🖍️
 
 🎯 Pressione **2** para pedir uma pista 💡
 
-🎯 É possível **salvar** seu progresso 
+🎯 É possível **salvar** seu progresso, apertando **4** e digitando o nome do arquivo .json desejado
 
 🎯 O jogo termina quando você **completa o quebra-cabeça** ou **perde todas as vidas**
 
