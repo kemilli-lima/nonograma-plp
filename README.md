@@ -1,4 +1,4 @@
-# 🎨 Nonograma - Quebra-Cabeça Lógico
+# 🎨 Nonograma
 
 Bem-vindo ao **Nonograma**! Um jogo de quebra-cabeça lógico-visual onde você deve preencher a grade corretamente para revelar uma imagem oculta! 🖼️
 
