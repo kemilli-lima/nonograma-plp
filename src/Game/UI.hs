@@ -128,7 +128,7 @@ displayMenu = do
     
     setSGR [Reset]
     setSGR [SetColor Foreground Vivid Blue]
-    putStrLn "║ 1. ✏️ Marcar célula (via WASD)  ║"
+    putStrLn "║ 1. ✏️ Marcar célula (via WASD) ║"
     setSGR [Reset]
 
     setSGR [SetColor Foreground Vivid Yellow]
@@ -141,6 +141,10 @@ displayMenu = do
 
     setSGR [SetColor Foreground Vivid Green]
     putStrLn "║ 4. 💾 Salvar jogo              ║"
+    setSGR [Reset]
+
+    setSGR [SetColor Foreground Vivid Cyan]
+    putStrLn "╚════════════════════════════════╝"
     setSGR [Reset]
     putStrLn ""
 
