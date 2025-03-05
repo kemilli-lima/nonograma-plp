@@ -1,6 +1,15 @@
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE DeriveAnyClass     #-}
 
+{-|
+Module      : Game.Estrutura
+Description : Define as estruturas básicas e o estado inicial do jogo.
+              
+Este módulo define os tipos fundamentais que representam o estado e a estrutura do jogo,
+incluindo as células, o grid, os níveis de dificuldade, a estrutura estática do jogo (Game) 
+e o estado dinâmico (GameState). Outros módulos, como Game.Logic, Game.PuzzleParser, 
+Game.SaveLoad e Game.UI, utilizam essas definições.
+-}
 module Game.Estrutura
     ( Cell(..)
     , Grid
@@ -13,46 +22,80 @@ module Game.Estrutura
 import GHC.Generics (Generic)
 import Data.Aeson (ToJSON, FromJSON)
 
--- Uma célula pode estar: [vazia], [preenchida corretamente] ou [marcada incorretamente]
-data Cell = Empty | Filled | Marked deriving (Eq, Generic, ToJSON, FromJSON)
-
+-- | Representa os possíveis estados de uma célula.
+data Cell = Empty   -- ^ Célula sem decisão.
+          | Filled  -- ^ Célula marcada como preenchida.
+          | Marked  -- ^ Célula marcada como não-preenchida.
+          deriving (Eq, Generic, ToJSON, FromJSON)
 
 instance Show Cell where
-    show Empty  = ". "  -- Célula sem decisão
-    show Filled = "x "  -- Célula marcada como errada
-    show Marked = "* "  -- Célula correta
+    show Empty  = ". "  
+    show Filled = "x "  
+    show Marked = "* "  
 
+-- | Define um grid como uma lista de listas de células.
 type Grid = [[Cell]]
 
-data Difficulty = Easy | Medium | Hard deriving (Eq, Show, Generic, ToJSON, FromJSON)
+-- | Representa os níveis de dificuldade do jogo.
+data Difficulty = Easy   
+                | Medium 
+                | Hard   
+                deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
--- Estrutura estática do jogo: contém o mapa final (solução), dicas fixas e dificuldade.
+{-|
+Representa a estrutura estática do jogo.
+
+Contém a solução final do puzzle, dicas para as linhas e colunas e o nível de dificuldade.
+
+@param solution  : Grid com a solução final.
+@param rowsHints : Lista de listas de inteiros representando as dicas do tabuleiro para as linhas.
+@param colsHints : Lista de listas de inteiros representando as dicas do tabuleiro para as colunas.
+@param difficulty: Nível de dificuldade do jogo.
+@return: Objeto do tipo 'Game'.
+-}
 data Game = Game {
-    solution  :: Grid,      -- Mapa final (solução)
-    rowsHints :: [[Int]],   -- Dicas das linhas
-    colsHints :: [[Int]],   -- Dicas das colunas
-    difficulty :: Difficulty -- Dificuldade (característica fixa do jogo)
+    solution   :: Grid,      
+    rowsHints  :: [[Int]],   
+    colsHints  :: [[Int]],   
+    difficulty :: Difficulty 
 } deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
--- Estado dinâmico do jogo: contém o progresso atual, vidas, etc.
+{-|
+Representa o estado dinâmico do jogo durante sua execução.
+
+Contém o grid atual, número de vidas restantes, a estrutura estática do jogo,
+status de resolução e a célula atualmente selecionada (cursor).
+
+@param currentGrid  : Grid atual do jogo.
+@param lives        : Número de vidas restantes.
+@param game         : Estrutura estática do jogo.
+@param isSolved     : Indica se o jogo foi resolvido.
+@param selectedCell : Tupla com as coordenadas da célula selecionada.
+@return: Objeto do tipo 'GameState'.
+-}
 data GameState = GameState {
-    currentGrid :: Grid,   -- Tabuleiro em jogo (por exemplo, inicialmente vazio)
-    lives       :: Int,    -- Vidas restantes
-    game        :: Game,   -- Estrutura estática do jogo
-    isSolved    :: Bool,    -- Indica se o jogo foi resolvido
-    selectedCell :: (Int, Int)  -- Coordenadas da célula selecionada (cursor)
+    currentGrid  :: Grid,
+    lives        :: Int,
+    game         :: Game,
+    isSolved     :: Bool,
+    selectedCell :: (Int, Int) 
 } deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
+{-|
+Inicializa o estado do jogo a partir de uma estrutura 'Game'.
 
--- Funcao para iniciar o tabuleiro, recebe um modelo e retorna o 1o gamestate
+@param jogo: Objeto do tipo 'Game' com a estrutura estática do jogo.
+@return: Estado inicial do jogo (GameState).
+-}
 initGame :: Game -> GameState
 initGame jogo = GameState
-    { currentGrid = replicate linhas (replicate colunas Empty) -- cria uma matriz vazia
-    , lives       = 3
-    , game        = jogo
-    , isSolved    = False
-    , selectedCell = (0, 0)  -- inicia com o cursor na posição (0,0)
+    { currentGrid  = replicate linhas (replicate colunas Empty) -- Cria um grid com todas as células marcadas como vazias.
+    , lives        = 3
+    , game         = jogo
+    , isSolved     = False
+    , selectedCell = (0, 0)  -- Posiciona o cursor na célula (0,0).
     }
   where
-    linhas  = length (solution jogo) -- Pega a qtdd de linhas da matriz
-    colunas = length (head (solution jogo)) -- entra no vector da 1a linha e pega o tamanho do vector
+    linhas  = length (solution jogo)       -- Número de linhas da solução.
+    colunas = length (head (solution jogo))  -- Número de colunas (baseado na primeira linha).
+
