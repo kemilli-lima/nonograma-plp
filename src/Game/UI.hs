@@ -2,6 +2,14 @@
 {-# HLINT ignore "Use zipWithM_" #-}
 {-# HLINT ignore "Use head" #-}
 {-# HLINT ignore "Redundant return" #-}
+{-|
+Module      : Game.UI
+Description : Implementa a interface do usuário para o jogo.
+
+Este módulo trata da exibição do tabuleiro, dicas, menus e navegação do cursor.
+Utiliza funções dos módulos Game.Logic, Game.SaveLoad e Game.Estrutura para atualizar e exibir
+o estado do jogo, além de fornecer opções para salvar e interagir com o jogo através do teclado.
+-}
 module Game.UI where
 
 import Game.Logic
@@ -12,20 +20,39 @@ import System.Console.ANSI
 import System.IO
 import Control.Monad (when)
 
+-- | Largura fixa para formatação das células.
 cellWidth :: Int
 cellWidth = 2
 
+{-|
+Adiciona espaços à esquerda para alinhar uma string com base em um tamanho fixo.
+
+@param n: Número total de caracteres desejado.
+@param s: String original.
+@return: String com espaços adicionados à esquerda até atingir o tamanho 'n'.
+-}
 padLeft :: Int -> String -> String
 padLeft n s = replicate (n - length s) ' ' ++ s
 
--- Formata uma lista de dicas em uma string com largura fixa
+{-|
+Formata uma lista de dicas em uma única string.
+
+@param maxSize: Tamanho máximo para alinhamento.
+@param hints: Lista de inteiros representando as dicas.
+@return: String com as dicas formatadas e alinhadas.
+-}
 formatHints :: Int -> [Int] -> String
 formatHints maxSize hints =
     let hintStrs = map (padLeft cellWidth . show) hints
         padding  = replicate (cellWidth * (maxSize - length hints)) ' '
     in padding ++ concat hintStrs
 
--- Alinha as dicas das colunas (cabeçalho)
+{-|
+Alinha as dicas das colunas para exibição no cabeçalho do tabuleiro.
+
+@param cols: Lista de listas de inteiros, onde cada sublista representa as dicas de uma coluna.
+@return: Lista de strings, cada uma representando uma linha do cabeçalho alinhado.
+-}
 alignColHints :: [[Int]] -> [String]
 alignColHints cols =
     let maxHintSize = maximum (map length cols)
@@ -38,18 +65,33 @@ alignColHints cols =
         headerRows = transpose splitCols
     in map concat headerRows
 
--- Renderiza uma célula normalmente
+{-|
+Renderiza uma célula para exibição normal no tabuleiro.
+
+@param cell: Valor do tipo 'Cell' a ser renderizado.
+@return: String formatada representando a célula.
+-}
 renderCell :: Cell -> String
 renderCell Empty  = "\ESC[37m·\ESC[0m "
 renderCell Filled = "\ESC[32m■\ESC[0m "
 renderCell Marked = "\ESC[31mX\ESC[0m "
 
--- Renderiza a célula selecionada com realce usando sublinhado
+{-|
+Renderiza a célula selecionada com destaque (sublinhado).
+
+@param cell: Valor do tipo 'Cell' que está selecionado.
+@return: String formatada com destaque para a célula selecionada.
+-}
 renderSelectedCell :: Cell -> String
 renderSelectedCell cell =
     "\ESC[4m" ++ renderCell cell ++ "\ESC[0m "
 
--- Desenha a interface do jogo, destacando a célula selecionada
+{-|
+Desenha a interface do jogo, exibindo vidas, dicas e o grid.
+
+@param gameState: Estado atual do jogo.
+@return: 'IO ()' – Exibe a interface no terminal.
+-}
 drawUI :: GameState -> IO ()
 drawUI gameState = do
     clearScreen
@@ -62,9 +104,9 @@ drawUI gameState = do
         colHintsAligned = alignColHints (colsHints gameData)
         leftMargin = replicate (cellWidth * maxRowHintSize + 2) ' '
         (selX, selY) = selectedCell gameState
-    -- Imprime as dicas das colunas
+    -- Exibe as dicas das colunas
     mapM_ (putStrLn . (leftMargin ++)) colHintsAligned
-    -- Renderiza o grid com realce para a célula selecionada
+    -- Renderiza o grid com destaque na célula selecionada
     let renderedRows = [ paddedRowHints !! i ++ " | " ++ concat [ if (i, j) == (selX, selY)
                                                                    then renderSelectedCell cell
                                                                    else renderCell cell
@@ -72,8 +114,11 @@ drawUI gameState = do
                        | (i, row) <- zip [0..] current ]
     mapM_ putStrLn renderedRows
 
+{-|
+Exibe o menu de opções para o jogador na interface.
 
--- Menu para o jogador
+@return: 'IO ()' – Exibe o menu principal no terminal.
+-}
 displayMenu :: IO ()
 displayMenu = do
     setSGR [SetColor Foreground Vivid Cyan]
@@ -97,13 +142,14 @@ displayMenu = do
     setSGR [SetColor Foreground Vivid Green]
     putStrLn "║ 4. 💾 Salvar jogo              ║"
     setSGR [Reset]
-
-    setSGR [SetColor Foreground Vivid Cyan]
-    putStrLn "╚════════════════════════════════╝"
-    setSGR [Reset]
     putStrLn ""
 
--- Loop de navegação: atualiza a posição do cursor com base na tecla pressionada
+{-|
+Loop de navegação que permite ao jogador mover o cursor usando WASD e selecionar uma célula com Enter.
+
+@param gameState: Estado atual do jogo.
+@return: 'IO GameState' – Retorna o estado atualizado com a nova posição do cursor.
+-}
 navigationLoop :: GameState -> IO GameState
 navigationLoop gameState = do
     drawUI gameState
@@ -125,10 +171,18 @@ navigationLoop gameState = do
                     _   -> (x, y)
         updatedState = gameState { selectedCell = newPos }
     if key == '\n'
-       then return gameState  -- Confirma a posição atual e encerra a navegação
+       then return gameState  -- Retorna o estado com o cursor na posição confirmada.
        else navigationLoop updatedState
 
--- Ativa o modo de navegação para marcar a célula selecionada via WASD
+{-|
+Ativa o modo de navegação para que o jogador selecione uma célula para marcar.
+
+Caso a célula selecionada já esteja preenchida, solicita uma nova seleção.
+Após a escolha, permite ao jogador definir o tipo de marcação (Filled ou Marked) e atualiza o estado.
+
+@param gameState: Estado atual do jogo.
+@return: 'IO GameState' – Retorna o estado do jogo após a marcação.
+-}
 navigateAndMark :: GameState -> IO GameState
 navigateAndMark gameState = do
     putStrLn "\ESC[36mNavegação ativada: mova o cursor para selecionar a célula.\ESC[0m"
@@ -155,14 +209,23 @@ navigateAndMark gameState = do
        _ <- getLine
        return updatedGameState
 
+{-|
+Solicita uma dica para o jogador, chamando a função 'giveHint' para corrigir uma célula.
 
--- Dá uma dica para o jogador
+@param gameState: Estado atual do jogo.
+@return: 'IO GameState' – Retorna o estado do jogo após fornecer a dica.
+-}
 requestHint :: GameState -> IO GameState
 requestHint gameState = do
     newGameState <- giveHint gameState
     return newGameState
 
--- Realiza o salvamento do jogo usando o módulo SaveLoad unificado
+{-|
+Realiza o salvamento do jogo solicitando o nome do arquivo onde o estado será salvo.
+
+@param gs: Estado atual do jogo.
+@return: 'IO GameState' – Retorna o mesmo estado após a operação de salvamento.
+-}
 saveGamePrompt :: GameState -> IO GameState
 saveGamePrompt gs = do
     putStrLn "Digite o nome do save (ex.: save.json):"
@@ -172,10 +235,17 @@ saveGamePrompt gs = do
         Left err -> putStrLn ("Erro ao salvar: " ++ err) >> return gs
         Right _  -> putStrLn "Jogo salvo com sucesso!" >> return gs
 
--- Loop principal do jogo com mensagens de vitória e game over decoradas
+{-|
+Loop principal do jogo, gerenciando a execução com base nas ações do jogador.
+
+Verifica condições de vitória e game over, exibe os menus e processa as escolhas do usuário.
+
+@param gameState: Estado atual do jogo.
+@return: 'IO ()' – Executa o loop principal até que o jogador saia ou o jogo termine.
+-}
 playGame :: GameState -> IO ()
 playGame gameState = do
-    drawUI gameState  -- exibe o tabuleiro
+    drawUI gameState  -- Exibe o grid.
     if checkVictory gameState
        then do
            setSGR [SetColor Foreground Vivid Green]
@@ -207,7 +277,13 @@ playGame gameState = do
                       putStrLn "Opção inválida. Tente novamente."
                       playGame gameState
 
--- Captura a opção do usuário
+{-|
+Captura e valida a escolha do usuário a partir do menu.
+
+Lê a entrada e verifica se é um número válido entre 1 e 4.
+
+@return: 'IO Int' – Retorna a opção escolhida pelo usuário.
+-}
 getUserChoice :: IO Int
 getUserChoice = do
     setSGR [SetColor Foreground Vivid Cyan]
@@ -220,7 +296,15 @@ getUserChoice = do
             putStrLn "\ESC[31m❌  Opção inválida! Tente novamente.\ESC[0m"
             getUserChoice
 
--- Inicia o jogo, recebendo também o nome do jogador
+{-|
+Inicia o jogo utilizando a estrutura 'Game' e o nome do jogador.
+
+Cria o estado inicial a partir da função 'initGame' e inicia o loop de jogo com 'playGame'.
+
+@param game: Estrutura estática do jogo.
+@param name: Nome do jogador.
+@return: 'IO ()' – Inicia o jogo.
+-}
 startGame :: Game -> String -> IO ()
 startGame game name = do
     let initialState = initGame game
