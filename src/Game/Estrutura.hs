@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE DeriveAnyClass     #-}
+
 module Game.Estrutura
     ( Cell(..)
     , Grid
@@ -7,8 +10,12 @@ module Game.Estrutura
     , initGame
     ) where
 
+import GHC.Generics (Generic)
+import Data.Aeson (ToJSON, FromJSON)
+
 -- Uma célula pode estar: [vazia], [preenchida corretamente] ou [marcada incorretamente]
-data Cell = Empty | Filled | Marked deriving (Eq)
+data Cell = Empty | Filled | Marked deriving (Eq, Generic, ToJSON, FromJSON)
+
 
 instance Show Cell where
     show Empty  = ". "  -- Célula sem decisão
@@ -17,7 +24,7 @@ instance Show Cell where
 
 type Grid = [[Cell]]
 
-data Difficulty = Easy | Medium | Hard deriving (Eq, Show)
+data Difficulty = Easy | Medium | Hard deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 -- Estrutura estática do jogo: contém o mapa final (solução), dicas fixas e dificuldade.
 data Game = Game {
@@ -25,27 +32,27 @@ data Game = Game {
     rowsHints :: [[Int]],   -- Dicas das linhas
     colsHints :: [[Int]],   -- Dicas das colunas
     difficulty :: Difficulty -- Dificuldade (característica fixa do jogo)
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 -- Estado dinâmico do jogo: contém o progresso atual, vidas, etc.
--- O campo selectedCell para acompanha a célula atualmente selecionada.
 data GameState = GameState {
-    currentGrid  :: Grid,       -- Tabuleiro em jogo (por exemplo, inicialmente vazio)
-    lives        :: Int,        -- Vidas restantes
-    game         :: Game,       -- Estrutura estática do jogo
-    isSolved     :: Bool,       -- Indica se o jogo foi resolvido
+    currentGrid :: Grid,   -- Tabuleiro em jogo (por exemplo, inicialmente vazio)
+    lives       :: Int,    -- Vidas restantes
+    game        :: Game,   -- Estrutura estática do jogo
+    isSolved    :: Bool,    -- Indica se o jogo foi resolvido
     selectedCell :: (Int, Int)  -- Coordenadas da célula selecionada (cursor)
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
--- Função para iniciar o tabuleiro, recebe um modelo e retorna o 1o GameState
+
+-- Funcao para iniciar o tabuleiro, recebe um modelo e retorna o 1o gamestate
 initGame :: Game -> GameState
 initGame jogo = GameState
-    { currentGrid  = replicate linhas (replicate colunas Empty) -- cria uma matriz vazia
-    , lives        = 3
-    , game         = jogo
-    , isSolved     = False
+    { currentGrid = replicate linhas (replicate colunas Empty) -- cria uma matriz vazia
+    , lives       = 3
+    , game        = jogo
+    , isSolved    = False
     , selectedCell = (0, 0)  -- inicia com o cursor na posição (0,0)
     }
   where
-    linhas  = length (solution jogo)        -- Qtde de linhas da solução
-    colunas = length (head (solution jogo))   -- Tamanho da 1ª linha da solução
+    linhas  = length (solution jogo) -- Pega a qtdd de linhas da matriz
+    colunas = length (head (solution jogo)) -- entra no vector da 1a linha e pega o tamanho do vector

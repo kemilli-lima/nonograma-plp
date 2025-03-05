@@ -6,34 +6,43 @@ module Game.Logic
     ) where
 
 import Game.Estrutura
+import Game.Utils (isValidCoordinate)
 
--- Atualiza uma célula do tabuleiro e verifica se a marcação está correta
+isCorrectMove :: GameState -> (Int, Int) -> Cell -> Bool
+isCorrectMove gameState (x, y) value =
+    let correctValue = solution (game gameState) !! x !! y
+    in value == correctValue
+
 updateCellWithCheck :: GameState -> (Int, Int) -> Cell -> IO GameState
 updateCellWithCheck gameState (x, y) cellValue
-    | x < 0 || x >= length grid || y < 0 || y >= length (head grid) = do
-        -- Coordenadas fora dos limites: retorna o estado inalterado
-        putStrLn "Coordenadas inválidas! Jogada ignorada."
+    | not (isValidCoordinate (rows, cols) (x, y)) = do
+        putStrLn "Coordenadas inválidas!"
         return gameState
-    | cellValue /= correctValue = do
-        -- Jogada incorreta: reduz as vidas e mantém o grid inalterado
-        putStrLn "Jogada errada! Você perdeu uma vida."
-        return gameState { lives = max 0 (lives gameState - 1) }
     | otherwise = do
-        -- Jogada correta: atualiza o grid e verifica se o jogo foi resolvido
-        let newGrid = updateGrid grid (x, y) cellValue
-            newSolved = newGrid == sol
-        return gameState { currentGrid = newGrid, isSolved = newSolved }
+        let correctValue = solution (game gameState) !! x !! y
+        let oldCell = (currentGrid gameState !! x) !! y
+        
+        if oldCell == cellValue then do
+            putStrLn "A célula já está com este valor."
+            return gameState
+        else if cellValue /= correctValue then do
+            putStrLn "Jogada errada! Você perdeu uma vida."
+            return gameState { lives = max 0 (lives gameState - 1) }
+        else do
+            -- Jogada correta: atualiza a grade sem perder vidas
+            let newGrid = updateGrid (currentGrid gameState) (x, y) cellValue
+            return gameState { currentGrid = newGrid }
   where
     grid = currentGrid gameState
-    sol = solution (game gameState)
-    correctValue = (sol !! x) !! y
+    rows = length grid
+    cols = if null grid then 0 else length (head grid)
 
--- Função auxiliar para atualizar o grid
 updateGrid :: [[Cell]] -> (Int, Int) -> Cell -> [[Cell]]
 updateGrid grid (x, y) cellValue =
     take x grid ++
     [take y (grid !! x) ++ [cellValue] ++ drop (y + 1) (grid !! x)] ++
     drop (x + 1) grid
+
 
 -- Verifica se o jogador venceu o jogo
 checkVictory :: GameState -> Bool

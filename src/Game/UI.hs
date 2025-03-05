@@ -7,6 +7,7 @@ module Game.UI where
 import Game.Logic
 import Game.Estrutura
 import Data.List (transpose, intersperse)
+import Game.SaveLoad (saveGame)
 import System.Console.ANSI
 import System.IO
 import Control.Monad (when)
@@ -71,6 +72,7 @@ drawUI gameState = do
                        | (i, row) <- zip [0..] current ]
     mapM_ putStrLn renderedRows
 
+
 -- Menu para o jogador
 displayMenu :: IO ()
 displayMenu = do
@@ -78,16 +80,24 @@ displayMenu = do
     putStrLn "\n╔════════════════════════════════╗"
     putStrLn "║    🎮 ESCOLHA UMA OPÇÃO 🎮     ║"
     putStrLn "╠════════════════════════════════╣"
+    
     setSGR [Reset]
     setSGR [SetColor Foreground Vivid Blue]
     putStrLn "║ 1. ✏️ Marcar célula (via WASD)  ║"
     setSGR [Reset]
+
     setSGR [SetColor Foreground Vivid Yellow]
     putStrLn "║ 2. 💡 Pedir dica               ║"
     setSGR [Reset]
+
     setSGR [SetColor Foreground Vivid Magenta]
     putStrLn "║ 3. 🚪 Sair                     ║"
     setSGR [Reset]
+
+    setSGR [SetColor Foreground Vivid Green]
+    putStrLn "║ 4. 💾 Salvar jogo              ║"
+    setSGR [Reset]
+
     setSGR [SetColor Foreground Vivid Cyan]
     putStrLn "╚════════════════════════════════╝"
     setSGR [Reset]
@@ -145,11 +155,22 @@ navigateAndMark gameState = do
        _ <- getLine
        return updatedGameState
 
+
 -- Dá uma dica para o jogador
 requestHint :: GameState -> IO GameState
 requestHint gameState = do
     newGameState <- giveHint gameState
     return newGameState
+
+-- Realiza o salvamento do jogo usando o módulo SaveLoad unificado
+saveGamePrompt :: GameState -> IO GameState
+saveGamePrompt gs = do
+    putStrLn "Digite o nome do save (ex.: save.json):"
+    name <- getLine
+    result <- saveGame name gs
+    case result of
+        Left err -> putStrLn ("Erro ao salvar: " ++ err) >> return gs
+        Right _  -> putStrLn "Jogo salvo com sucesso!" >> return gs
 
 -- Loop principal do jogo com mensagens de vitória e game over decoradas
 playGame :: GameState -> IO ()

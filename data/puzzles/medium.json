@@ -1,0 +1,40 @@
+[
+    {
+        "solution": [
+            ["Marked", "Marked", "Filled", "Marked", "Marked"],
+            ["Marked", "Filled", "Filled", "Filled", "Marked"],
+            ["Filled", "Filled", "Filled", "Filled", "Filled"],
+            ["Marked", "Filled", "Filled", "Filled", "Marked"],
+            ["Marked", "Marked", "Filled", "Marked", "Marked"]
+        ],
+        "rowsHints": [[1], [3], [5], [3], [1]],
+        "colsHints": [[1], [3], [5], [3], [1]],
+        "difficulty": "Medium"
+    },
+
+    {
+        "solution": [
+            ["Filled", "Filled", "Marked", "Filled", "Filled"],
+            ["Filled", "Filled", "Marked", "Filled", "Filled"],
+            ["Marked", "Marked", "Filled", "Marked", "Marked"],
+            ["Marked", "Filled", "Marked", "Filled", "Marked"],
+            ["Filled", "Marked", "Marked", "Marked", "Filled"]
+        ],
+        "rowsHints": [[2, 2], [2, 2], [1], [1, 1], [1, 1]],
+        "colsHints": [[2, 1], [2, 1], [1], [2, 1], [2, 1]],
+        "difficulty": "Medium"
+    },
+
+    {
+        "solution": [
+            ["Marked", "Marked", "Filled", "Marked", "Marked"],
+            ["Marked", "Filled", "Filled", "Filled", "Marked"],
+            ["Filled", "Filled", "Filled", "Filled", "Filled"],
+            ["Marked", "Filled", "Marked", "Filled", "Marked"],
+            ["Marked", "Filled", "Marked", "Filled", "Marked"]
+        ],
+        "rowsHints": [[1], [3], [5], [1, 1], [1, 1]],
+        "colsHints": [[1], [4], [3], [4], [1]],
+        "difficulty": "Medium"
+    }
+]

@@ -7,3 +7,8 @@ Para executar o problema e visualizar os emojis é necessário rodar os seguinte
 
 Após isso, dentro do diretório src, execute:
 ```runhaskell Game/Main.hs ```
+
+
+```cabal clean ```
+```cabal build ```
+```cabal run ```
