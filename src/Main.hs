@@ -6,86 +6,56 @@ import Game.PuzzleParser (parsePuzzle)
 import Game.SaveLoad (saveGame, loadGame)
 import Data.Char (toLower)
 import System.IO (stdout, hFlush)
-
-easyGame :: Game
-easyGame = Game 
-    [ [Filled, Filled, Filled, Marked]
-    , [Marked, Filled, Filled, Filled]
-    , [Filled, Marked, Filled, Marked]
-    , [Filled, Filled, Marked, Filled]
-    ] [[3],[3],[2],[3]] [[2],[2],[3],[3]] Easy
-    
-mediumGame :: Game
-mediumGame = Game 
-    [ [Marked, Marked, Filled, Marked, Marked]  
-    , [Marked, Filled, Filled, Filled, Marked]
-    , [Filled, Filled, Filled, Filled, Filled]
-    , [Marked, Filled, Filled, Filled, Marked]
-    , [Marked, Marked, Filled, Marked, Marked] 
-    ] [[1], [3], [5], [3], [1]] [[1], [3], [5], [3], [1]]
-    Medium
-
-
-hardGame :: Game
-hardGame = Game 
-    [[Marked, Empty,  Empty,  Empty,  Empty,  Empty,  Marked]
-        , [Marked, Filled, Filled, Empty, Filled, Filled, Empty]
-        , [Filled, Filled, Filled, Filled, Filled, Filled, Filled]
-        , [Filled, Filled, Filled, Filled, Filled, Filled, Filled]
-        , [Empty,  Filled, Filled, Filled, Filled, Filled, Empty]
-        , [Empty,  Empty,  Filled, Filled, Filled, Empty,  Empty]
-        , [Empty,  Empty,  Empty, Filled, Empty, Empty,  Empty]
-        ]
-    [[0], [2, 2], [7], [7], [5], [3], [1]] [[2], [4], [6], [6], [6], [4], [2]] Hard
-
+import System.Console.ANSI  -- Importação adicionada
+import System.Random (randomRIO)
 
 -- Converte a string de entrada para um nível de dificuldade válido
 parseDifficultyInput :: String -> Difficulty
 parseDifficultyInput input =
     case map toLower input of
-        "f" -> Easy
-        "m" -> Medium
-        "d" -> Hard
+        "1" -> Easy
+        "2" -> Medium
+        "3" -> Hard
         _   -> Medium -- Padrão caso a entrada seja inválida
 
-main :: IO ()
-main = do
-    hFlush stdout
-    putStrLn "\ESC[36m\nBem-vindo ao jogo Nonograma! \ESC[0m"
-    putStrLn "\ESC[36m-----------------------------------------\ESC[0m"
-    
-    -- Menu principal
-    putStrLn "Escolha uma opção:"
-    putStrLn "1. Novo Jogo"
-    putStrLn "2. Carregar Jogo"
-    option <- getLine
-    
-    case option of
-        "1" -> startNewGame
-        "2" -> loadExistingGame
-        _   -> do
-            putStrLn "Opção inválida! Tente novamente."
-            main
+chooseRandomGame :: [Game] -> IO Game
+chooseRandomGame games = do
+    let numGames = length games
+    if numGames == 0
+        then error "Nenhum jogo disponível no arquivo."
+        else do
+            index <- randomRIO (0, numGames - 1)
+            return $ games !! index
 
 -- Inicia um novo jogo
-startNewGame :: IO ()
-startNewGame = do
-    putStrLn "Digite seu nome:"
-    name <- getLine
-    putStrLn "\n"
-    putStrLn (name ++ ", selecione a dificuldade que você deseja (F para Fácil/M para Médio/D para Difícil):")
+startNewGame :: String -> IO ()  -- Alterado para receber 'name'
+startNewGame name = do
+    putStrLn ("\n\ESC[36m Selecione a dificuldade:\ESC[97m\n ")
+    putStrLn "╔══════════════════════╗"
+    putStrLn "║   \ESC[32m1 ● Fácil \ESC[97m         ║"  -- Verde para fácil
+    putStrLn "║   \ESC[33m2 ● Médio \ESC[97m         ║"  -- Amarelo para médio
+    putStrLn "║   \ESC[31m3 ● Difícil \ESC[97m       ║"  -- Vermelho para difícil
+    putStrLn "╚══════════════════════╝"
+    putStrLn "\ESC[36m ▶ \ESC[36m Opção: \ESC[0m"
+    setSGR [Reset]
+
+    -- Lê a escolha do usuário
     diff <- getLine
     hFlush stdout
+    
+    -- Determina a dificuldade escolhida
     let difficulty = parseDifficultyInput diff
         puzzlePath = case difficulty of
-            Easy   -> "data/puzzles/easy.txt"
-            Medium -> "data/puzzles/medium.txt"
-            Hard   -> "data/puzzles/hard.txt"
-    eitherGame <- parsePuzzle puzzlePath
-    case eitherGame of
+            Easy   -> "data/puzzles/easy.json"
+            Medium -> "data/puzzles/medium.json"
+            Hard   -> "data/puzzles/hard.json"
+    
+    eitherGames <- parsePuzzle puzzlePath
+    case eitherGames of
         Left err -> putStrLn $ "Erro: " ++ err
-        Right game -> startGame game name
-
+        Right games -> do
+            randomGame <- chooseRandomGame games
+            startGame randomGame name
 
 -- Carrega um jogo existente
 loadExistingGame :: IO ()
@@ -100,3 +70,32 @@ loadExistingGame = do
         Right gameState -> do
             putStrLn $ "Jogo carregado com sucesso!"
             playGame gameState
+
+main :: IO ()
+main = do
+    hFlush stdout
+    putStrLn "\ESC[36m██  █  ███  ██  █  ███  █████  ███  ████ █   █ ████ "
+    putStrLn "\ESC[36m█ █ █ █   █ █ █ █ █   █ █      █  █ █  █ ██ ██ █  █ "
+    putStrLn "\ESC[36m█  ██ █   █ █  ██ █   █ █ ███  ███  ████ █ █ █ ████  "
+    putStrLn "\ESC[36m█   █  ███  █   █  ███  █████  █  █ █  █ █   █ █  █  "
+    setSGR [SetConsoleIntensity BoldIntensity]
+    putStrLn "\n\ESC[36mBem-vindo(a) ao jogo! Qual o seu nome?\ESC[97m\n"
+    name <- getLine
+    putStrLn ("\n\ESC[36mOlá " ++ name ++ "! Escolha uma opção:\ESC[97m\n ")
+    putStrLn "╔══════════════════════╗"
+    putStrLn "║   \ESC[97m1 ● Novo Jogo \ESC[97m     ║"  -- Verde para fácil
+    putStrLn "║   \ESC[97m2 ● Carregar Jogo \ESC[97m ║"  -- Amarelo para médio
+    putStrLn "╚══════════════════════╝"
+    putStrLn "\ESC[36m ▶ \ESC[36m Opção: \ESC[0m"
+    setSGR [Reset]
+
+    -- Lê a escolha do usuário
+    diff <- getLine
+    hFlush stdout
+
+    case diff of  -- Alterado para usar 'diff' em vez de 'option'
+        "1" -> startNewGame name
+        "2" -> loadExistingGame
+        _   -> do
+            putStrLn "Opção inválida! Tente novamente."
+            main

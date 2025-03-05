@@ -1,0 +1,24 @@
+[
+    {
+        "solution": [
+            ["Filled", "Filled", "Filled", "Marked"],
+            ["Marked", "Filled", "Filled", "Filled"],
+            ["Filled", "Marked", "Filled", "Marked"],
+            ["Filled", "Filled", "Marked", "Filled"]
+        ],
+        "rowsHints": [[3], [3], [2], [3]],
+        "colsHints": [[2], [2], [3], [3]],
+        "difficulty": "Easy"
+    },
+    {
+        "solution": [
+            ["Filled", "Marked", "Filled", "Marked"],
+            ["Marked", "Filled", "Marked", "Filled"],
+            ["Filled", "Marked", "Filled", "Marked"],
+            ["Marked", "Filled", "Marked", "Filled"]
+        ],
+        "rowsHints": [[2], [2], [2], [2]],
+        "colsHints": [[2], [2], [2], [2]],
+        "difficulty": "Easy"
+    }
+]

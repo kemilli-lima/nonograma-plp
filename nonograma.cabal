@@ -21,5 +21,6 @@ executable nonograma
                        random,
                        text,
                        transformers,
-                       ansi-terminal
+                       ansi-terminal,
+                       random
   default-language:    Haskell2010

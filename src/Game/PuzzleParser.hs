@@ -9,7 +9,7 @@ import System.Directory (doesFileExist)
 import Game.Estrutura (Game(..), Cell(..), Difficulty(..))
 
 -- | Lê um arquivo de puzzle e o interpreta conforme sua extensão (JSON ou TXT).
-parsePuzzle :: FilePath -> IO (Either String Game)
+parsePuzzle :: FilePath -> IO (Either String [Game])
 parsePuzzle filePath = do
     exists <- doesFileExist filePath
     if not exists
@@ -18,12 +18,18 @@ parsePuzzle filePath = do
             content <- B.readFile filePath
             if ".json" `isSuffixOf` filePath
                 then parseJSON content
-                else parseTXT content
+                else do
+                    result <- parseTXT content
+                    return $ case result of
+                        Left err -> Left err
+                        Right game -> Right [game]  -- Transformar em uma lista
 
-parseJSON :: B.ByteString -> IO (Either String Game)
+
+
+parseJSON :: B.ByteString -> IO (Either String [Game])
 parseJSON content = case eitherDecode content of
     Left err -> return $ Left $ "Erro JSON: " ++ err
-    Right game -> return $ validateGame game
+    Right games -> return $ Right games
 
 parseTXT :: B.ByteString -> IO (Either String Game)
 parseTXT content = do
