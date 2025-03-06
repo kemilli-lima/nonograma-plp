@@ -18,7 +18,7 @@
           ["Filled", "Filled", "Filled", "Filled"],
           ["Filled", "Marked", "Marked", "Filled"]
         ],
-        "rowsHints": [[1, 1], [1, 1], [1, 1], [1, 1]],
+        "rowsHints": [[1, 1], [1, 1], [4], [1, 1]],
         "colsHints": [[4], [1], [1], [4]],
         "difficulty": "Easy"
     },
