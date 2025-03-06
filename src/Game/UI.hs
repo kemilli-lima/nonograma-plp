@@ -200,7 +200,7 @@ navigateAndMark gameState = do
        _ <- getLine
        navigateAndMark newState
     else do
-       putStrLn "\nDigite o tipo de marcação para a célula selecionada (1 para preenchida, 2 para marcada incorreta):"
+       putStrLn "\nDigite o tipo de marcação para a célula selecionada (1 para preenchida, 2 para marcada não-colorida):"
        markType <- getLine
        let cellValue = if markType == "1" then Filled else Marked
        updatedGameState <- updateCellWithCheck newState (selX, selY) cellValue
