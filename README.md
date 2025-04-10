@@ -26,13 +26,21 @@ Bem-vindo ao **Nonograma**! Um jogo de quebra-cabeça lógico-visual onde você 
 
 🔹 [Cabal](https://www.haskell.org/cabal/) 📦
 
+🔹 [SWI - Prolog](https://www.swi-prolog.org/download/stable) ⚙️
+
 ---
 
 ## 🎯 Como Executar
 1️⃣  Clone este repositório:
    ```sh
-   git clone https://github.com/kemilli-lima/nonograma-haskell.git
-   cd nonograma-haskell
+   git clone https://github.com/kemilli-lima/nonograma-plp.git
+   cd nonograma-plp
+
+   // Caso deseje acessar o jogo em Haskell
+   cd haskell
+
+   // Caso deseje acessar o jogo em Prolog
+   cd prolog
    ```
 
 2️⃣ Para garantir os efeitos visuais e as cores do jogo no terminal, é necessário executar os seguintes comandos antes:
@@ -52,11 +60,16 @@ Bem-vindo ao **Nonograma**! Um jogo de quebra-cabeça lógico-visual onde você 
    defaults write -g AppleLocale en_US.UTF-8
    ```
 
-3️⃣  Compile e execute o jogo dentro do diretório raíz:
+3️⃣  Compile e execute o jogo dentro do diretório haskell (Caso deseje jogar em haskell):
    ```sh
    cabal clean
    cabal build
    cabal run
+   ```
+
+3️⃣  Compile e execute o jogo dentro do diretório prolog (Caso deseje jogar em prolog):
+   ```sh
+   swipl -g run -o nonograma -c src/main.pl
    ```
 
 ---
@@ -66,11 +79,14 @@ Bem-vindo ao **Nonograma**! Um jogo de quebra-cabeça lógico-visual onde você 
 
 🎯 Use as teclas **WASD** para navegar pela grade
 
-🎯 Pressione **Enter** para marcar uma célula como preenchida (1 para colorida e 2 para não-colorida) 🖍️
 
-🎯 Pressione **2** para pedir uma pista 💡
+🎯 Pressione a tecla **f** para marcar uma célula como preenchida ou a tecla **m** para não-preenchida
 
-🎯 É possível **salvar** seu progresso, apertando **4** e digitando o nome do arquivo .json desejado
+🎯 Pressione a tecla **h** para pedir uma pista 💡
+
+🎯 É possível **salvar** seu progresso, apertando a tecla **v** e digitando o nome do arquivo .sav desejado (Apenas o nome do arquivo)
+
+🎯 Caso deseje recuperar um jogo salvo, selecione o **número correspondente** no menu. 
 
 🎯 O jogo termina quando você **completa o quebra-cabeça** ou **perde todas as vidas**
 
@@ -83,6 +99,11 @@ O jogo foi desenvolvido para a disciplina de Paradigmas de Linguagem de Programa
 - João Victor Limeira ([Github](https://github.com/joaoSilvaL)) 
 - Carlos Nogueira ([Github](https://github.com/carlsnog)) 
 - Nívea Calébia ([Github](https://github.com/calebia))  
+
+---
+
+## 🔧 Observações
+🔹 O repositório inicial do nonograma em Prolog é ([Github](https://github.com/kemilli-lima/nonograma-prolog-plp.git)). Porém, decidimos unir tudo em um único repositório. 
 
 ---
 
